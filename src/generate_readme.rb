@@ -27,7 +27,7 @@ end
 
 # Create template.
 template = %q{
-  # Lighthouse
+  ## Lighthouse
 
   **Updated at <%= Time.now %> by [CircleCI #<%= ENV['CIRCLE_BUILD_NUM'] %>](<%= ENV['CIRCLE_BUILD_URL'] %>)**
 
@@ -42,6 +42,6 @@ template = %q{
 
 erb = ERB.new(template, 0, "%<>")
 
-File.open('README.md', 'w') do |f|
+File.open('README.md', 'a') do |f|
   f.write erb.result
 end
