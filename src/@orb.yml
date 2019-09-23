@@ -1,13 +1,13 @@
 version: 2.1
 
 #######################################################################################
-# GitHub:   https://github.com/ItinerisLtd/lighthouse-keeper/blob/master/src/@orb.yml #
-# CircleCI: https://circleci.com/orbs/registry/orb/itinerisltd/lighthouse-keeper      #
+# GitHub:   https://github.com/jamesmosier/lighthouse-stats-circleci/blob/master/src/@orb.yml #
+# CircleCI: https://circleci.com/orbs/registry/orb/jamesmosier/lighthouse-stats      #
 #######################################################################################
 
 description: |
-  Record lighthouse reports in git repository automatically
-  Source Code: https://github.com/ItinerisLtd/lighthouse-keeper/blob/master/src/@orb.yml
+  Record Google Lighthouse reports in a repository automatically
+  Source Code: https://github.com/jamesmosier/lighthouse-stats-circleci/blob/master/src/@orb.yml
 
 executors:
   node:
@@ -22,7 +22,7 @@ jobs:
     parameters:
       id:
         type: string
-        description: Identifier for the URL, must not special characters
+        description: Identifier for the URL, must not contain special characters
       url:
         type: string
         description: URL to be tested
@@ -36,24 +36,24 @@ jobs:
 
       - restore_cache:
           keys:
-            - v0-itinerisltd-lighthouse-keeper-yarn-cache-{{ arch }}-
+            - v0-jdm-lighthouse-stats-yarn-cache-{{ arch }}-
       - run: yarn global add lighthouse
       - save_cache:
-          key: v0-itinerisltd-lighthouse-keeper-yarn-cache-{{ arch }}-{{ epoch }}
+          key: v0-jdm-lighthouse-stats-yarn-cache-{{ arch }}-{{ epoch }}
           paths:
             - ~/.yarn/cache
 
       - run: $(yarn global bin)/lighthouse --version
 
-      - run: mkdir -p results/<< parameters.id >>
+      - run: mkdir -p stats/<< parameters.id >>
       - run:
           command: $(yarn global bin)/lighthouse << parameters.url >> --output=json --output=html --verbose || true
-          working_directory: results/<< parameters.id >>
+          working_directory: stats/<< parameters.id >>
 
       - persist_to_workspace:
           root: ~/project
           paths:
-            - results
+            - stats
 
   commit:
     parameters:
@@ -69,7 +69,7 @@ jobs:
       readme_generator_script:
         type: string
         description: Git committer SSH fingerprint
-        default: https://raw.githubusercontent.com/ItinerisLtd/lighthouse-keeper/master/src/generate_readme.rb
+        default: https://raw.githubusercontent.com/jamesmosier/lighthouse-stats-circleci/master/src/generate_readme.rb
       executor:
         type: executor
         default: ruby
@@ -84,7 +84,7 @@ jobs:
       - attach_workspace:
           at: ~/project
 
-      - run: git add results/*.{html,json}
+      - run: git add stats/*.{html,json}
       - run: git status
 
       - run: curl << parameters.readme_generator_script >> | ruby
@@ -92,9 +92,9 @@ jobs:
 
       - run: git status
       - run: |
-          git commit -m "[ci skip] Add reports - CircleCI #$CIRCLE_BUILD_NUM" -m $CIRCLE_BUILD_URL
+          git commit -m "[ci skip] Added Lighthouse reports - CircleCI #$CIRCLE_BUILD_NUM" -m $CIRCLE_BUILD_URL
 
       - add_ssh_keys:
           fingerprints:
             - << parameters.git_ssh_fingerprint >>
-      - run: git push origin master
+      - run: git push origin perftest
