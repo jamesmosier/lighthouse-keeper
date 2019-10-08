@@ -42,10 +42,12 @@ jobs:
 
       - run: $(yarn global bin)/lighthouse --version
 
-      - run: mkdir -p stats/{{ .Revision }}_{{ epoch }}
+      - run: export UNIX_DATE=$(date +%s | cut -b1-13)
+
+      - run: mkdir -p stats/$(echo "$UNIX_DATE")
       - run:
           command: $(yarn global bin)/lighthouse "<< parameters.url >>" --output=json --output=html --verbose || true
-          working_directory: stats/{{ .Revision }}_{{ epoch }}
+          working_directory: stats/$(echo "$UNIX_DATE")
 
       - persist_to_workspace:
           root: ~/project
