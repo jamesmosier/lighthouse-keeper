@@ -2,12 +2,12 @@ require 'erb'
 require 'json'
 
 
-sites = Dir.chdir('reports') do
+sites = Dir.chdir('stats') do
   Dir.glob('*').select { |f| File.directory? f }
 end
 
 latest_jsons = sites.map do |site|
-  Dir.glob(File.join('reports', site, '*.json')).max_by(&File.method(:ctime))
+  Dir.glob(File.join('stats', site, '*.json')).max_by(&File.method(:ctime))
 end.reject(&:nil?)
 
 items = latest_jsons.map do |json|
@@ -17,11 +17,11 @@ items = latest_jsons.map do |json|
     json: json,
     requested_url: data.dig(:requestedUrl),
     created_at: data.dig(:fetchTime),
-    performance: data.dig(:categories, :performance, :score),
-    accessibility: data.dig(:categories, :accessibility, :score),
-    best_practices: data.dig(:categories, :"best-practices", :score),
-    seo: data.dig(:categories, :seo, :score),
-    pwa: data.dig(:categories, :pwa, :score)
+    performance: data.dig(:categories, :performance, :score) * 100,
+    accessibility: data.dig(:categories, :accessibility, :score) * 100,
+    best_practices: data.dig(:categories, :"best-practices", :score) * 100,
+    seo: data.dig(:categories, :seo, :score) * 100,
+    pwa: data.dig(:categories, :pwa, :score) * 100
   }
 end
 
@@ -36,7 +36,7 @@ template = %q{
   | URL | Performance | Accessibility | Best Practices | SEO | PWA | Updated At |
   | --- | --- | --- | --- | --- | --- | --- |
   % items.each do |item|
-    | [<%= item.dig(:requested_url) %>](./<%= item.dig(:json) %>) | <%= item.dig(:performance) %> | <%= item.dig(:accessibility) %> | <%= item.dig(:best_practices) %> | <%= item.dig(:seo) %> | <%= item.dig(:pwa) %> | <%= item.dig(:created_at) %> |
+    | [<%= item.dig(:requested_url) %>](./<%= item.dig(:json) %>) | <%= item.dig(:performance).round %>% | <%= item.dig(:accessibility).round %>% | <%= item.dig(:best_practices).round %>% | <%= item.dig(:seo).round %>% | <%= item.dig(:pwa).round %>% | <%= item.dig(:created_at) %> |
   % end
 }.gsub(/^ +/, '')
 
