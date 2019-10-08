@@ -88,7 +88,7 @@ jobs:
       - run: git status
 
       - run: curl << parameters.readme_generator_script >> | ruby
-      - run: git add README.md
+      - run: git add LIGHTHOUSE_REPORTS.md
 
       - run: git status
       - run: |
