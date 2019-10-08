@@ -2,12 +2,12 @@ require 'erb'
 require 'json'
 
 
-sites = Dir.chdir('results') do
+sites = Dir.chdir('reports') do
   Dir.glob('*').select { |f| File.directory? f }
 end
 
 latest_jsons = sites.map do |site|
-  Dir.glob(File.join('results', site, '*.json')).max_by(&File.method(:ctime))
+  Dir.glob(File.join('reports', site, '*.json')).max_by(&File.method(:ctime))
 end.reject(&:nil?)
 
 items = latest_jsons.map do |json|
