@@ -97,4 +97,4 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - << parameters.git_ssh_fingerprint >>
-      - run: git push origin develop/owner/perftest
+      - run: git push origin master
