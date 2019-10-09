@@ -1,13 +1,13 @@
 version: 2.1
 
 #######################################################################################
-# GitHub:   https://github.com/jamesmosier/lighthouse-stats-circleci/blob/master/src/@orb.yml #
-# CircleCI: https://circleci.com/orbs/registry/orb/jamesmosier/lighthouse-stats      #
+# GitHub:   https://github.com/rvshare/lighthouse-stats-circleci/blob/master/src/@orb.yml #
+# CircleCI: https://circleci.com/orbs/registry/orb/rvshare/lighthouse-stats      #
 #######################################################################################
 
 description: |
   Record Google Lighthouse reports in a repository automatically
-  Source Code: https://github.com/jamesmosier/lighthouse-stats-circleci/blob/master/src/@orb.yml
+  Source Code: https://github.com/rvshare/lighthouse-stats-circleci/blob/master/src/@orb.yml
 
 executors:
   node:
@@ -36,10 +36,10 @@ jobs:
 
       - restore_cache:
           keys:
-            - v0-jdm-lighthouse-stats-yarn-cache-{{ arch }}-
+            - v0-rvshare-lighthouse-stats-yarn-cache-{{ arch }}-
       - run: yarn global add lighthouse
       - save_cache:
-          key: v0-jdm-lighthouse-stats-yarn-cache-{{ arch }}-{{ epoch }}
+          key: v0-rvshare-lighthouse-stats-yarn-cache-{{ arch }}-{{ epoch }}
           paths:
             - ~/.yarn/cache
 
@@ -69,7 +69,7 @@ jobs:
       readme_generator_script:
         type: string
         description: Git committer SSH fingerprint
-        default: https://raw.githubusercontent.com/jamesmosier/lighthouse-stats-circleci/master/src/generate_readme.rb
+        default: https://raw.githubusercontent.com/rvshare/lighthouse-stats-circleci/master/src/generate_readme.rb
       executor:
         type: executor
         default: ruby

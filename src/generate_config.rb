@@ -15,7 +15,7 @@ template = %q{
   version: 2.1
 
   orbs:
-    lighthouse-keeper: itinerisltd/lighthouse-keeper@0.1
+    lighthouse-keeper: rvshare/lighthouse-stats@0.1
 
   workflows:
     lighthouse-keeper:
