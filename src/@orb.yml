@@ -23,6 +23,9 @@ jobs:
       url:
         type: string
         description: URL to be tested
+      folder_prefix:
+        type: string
+        description: Prefix of the file name
       executor:
         type: executor
         default: node
@@ -42,12 +45,10 @@ jobs:
 
       - run: $(yarn global bin)/lighthouse --version
 
-      - run: export UNIX_DATE=$(date +%s | cut -b1-13)
-
-      - run: mkdir -p stats/$(echo "$UNIX_DATE")
+      - run: mkdir -p stats/<< parameters.folder_prefix >>
       - run:
           command: $(yarn global bin)/lighthouse "<< parameters.url >>" --output=json --output=html --verbose || true
-          working_directory: stats/$(echo "$UNIX_DATE")
+          working_directory: stats/<< parameters.folder_prefix >>
 
       - persist_to_workspace:
           root: ~/project

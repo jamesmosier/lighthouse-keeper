@@ -1,29 +1,33 @@
 require 'erb'
 require 'json'
-
+require 'date'
 
 sites = Dir.chdir('stats') do
   Dir.glob('*').select { |f| File.directory? f }
 end
 
-latest_jsons = sites.map do |site|
-  Dir.glob(File.join('stats', site, '*.json')).max_by(&File.method(:ctime))
+json_files = sites.map do |site|
+  Dir.glob(File.join('stats', site, '*.json'))
 end.reject(&:nil?)
 
-items = latest_jsons.map do |json|
-  data = JSON.parse(File.read(json), symbolize_names: true)
+items = json_files.map do |files|
+  files.map do |json|
+    data = JSON.parse(File.read(json), symbolize_names: true)
 
-  {
-    json: json,
-    requested_url: data.dig(:requestedUrl),
-    created_at: data.dig(:fetchTime),
-    performance: data.dig(:categories, :performance, :score) * 100,
-    accessibility: data.dig(:categories, :accessibility, :score) * 100,
-    best_practices: data.dig(:categories, :"best-practices", :score) * 100,
-    seo: data.dig(:categories, :seo, :score) * 100,
-    pwa: data.dig(:categories, :pwa, :score) * 100
-  }
+    {
+      json: json,
+      requested_url: data.dig(:requestedUrl),
+      created_at: DateTime.parse(data.dig(:fetchTime)),
+      performance: data.dig(:categories, :performance, :score) * 100,
+      accessibility: data.dig(:categories, :accessibility, :score) * 100,
+      best_practices: data.dig(:categories, :"best-practices", :score) * 100,
+      seo: data.dig(:categories, :seo, :score) * 100,
+      pwa: data.dig(:categories, :pwa, :score) * 100
+    }
+  end
 end
+
+results = items.flatten(1).sort! { |a,b|  b[:created_at] <=> a[:created_at] }
 
 # Create template.
 template = %q{
@@ -35,8 +39,8 @@ template = %q{
 
   | URL | Performance | Accessibility | Best Practices | SEO | PWA | Updated At |
   | --- | --- | --- | --- | --- | --- | --- |
-  % items.each do |item|
-    | [<%= item.dig(:requested_url) %>](./<%= item.dig(:json) %>) | <%= item.dig(:performance).round %>% | <%= item.dig(:accessibility).round %>% | <%= item.dig(:best_practices).round %>% | <%= item.dig(:seo).round %>% | <%= item.dig(:pwa).round %>% | <%= item.dig(:created_at) %> |
+  % results.each do |item|
+    | [<%= item.dig(:requested_url) %>](./<%= item.dig(:json) %>) | <%= item.dig(:performance).round %>% | <%= item.dig(:accessibility).round %>% | <%= item.dig(:best_practices).round %>% | <%= item.dig(:seo).round %>% | <%= item.dig(:pwa).round %>% | <%= item.dig(:created_at).strftime("%m/%d/%Y %I:%M%p") %> |
   % end
 }.gsub(/^ +/, '')
 
