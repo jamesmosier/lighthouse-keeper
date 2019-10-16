@@ -31,7 +31,7 @@ results = items.flatten(1).sort! { |a,b|  b[:created_at] <=> a[:created_at] }
 
 # Create template.
 template = %q{
-  # Lighthouse Site Performance Report
+  # Lighthouse Site Performance Report Git release [<%= ENV['CIRCLE_TAG'] %>](https://github.com/rvshare/rvshare-marketplace/tree/<%= ENV['CIRCLE_TAG'] %>)
 
   **Updated at <%= Time.now %> by [CircleCI #<%= ENV['CIRCLE_BUILD_NUM'] %>](<%= ENV['CIRCLE_BUILD_URL'] %>)**
 
